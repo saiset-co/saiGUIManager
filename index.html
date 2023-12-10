@@ -1,10 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoJS</title>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script> <!-- JQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script> <!-- parse yaml -->
+    <script src="https://unpkg.com/gojs/release/go-debug.js"></script> <!-- GoJS -->
+
+    <link rel="stylesheet" href="https://unpkg.com/gojs@2.3.12/extensions/DataInspector.css">
+    <script src="https://unpkg.com/gojs@2.3.12/extensions/DataInspector.js"></script>
+
+
+    <!-- /////////////////////////////////////////////////////////////////////////////////////////////// -->
+    <link rel="stylesheet" type="text/css" media="screen" href="css/template-style.css">
+    <!-- /////////////////////////////////////////////////////////////////////////////////////////////// -->
+
 </head>
-<body>
+
+
+<body class="">
+
+<!-- HEADER -->
+<header id="header">
+    <h1>Welcome</h1>
+</header>
+<!-- END HEADER -->
+
+<!-- MAIN PANEL -->
+<div id="main" role="main">
+
+    <!-- MENU -->
+    <div id="menu">
+        <ul class="menu-list"></ul>
+    </div>
+    <!-- END MENU -->
+
+    <div id="content">
+        <div id="myDiagramDiv"
+             style="background-color: rgb(255, 255, 255); border: 1px solid black; width: 100%; height: 700px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;"
+             bis_skin_checked="1">
+            <canvas tabindex="0" width="1317" height="872"
+                    style="position: absolute; top: 0px; left: 0px; z-index: 2; user-select: none; touch-action: none; width: 1054px; height: 698px; cursor: auto;"></canvas>
+            <div style="position: absolute; overflow: auto; width: 1054px; height: 698px; z-index: 1;"
+                 bis_skin_checked="1">
+                <div style="position: absolute; width: 1px; height: 1px;" bis_skin_checked="1"></div>
+            </div>
+        </div>
+
+        <div class="modal"></div>
+
+        <div bis_skin_checked="1" class="edit">
+            Edit details:<br>
+            <div id="myInspector" class="inspector" bis_skin_checked="1"></div>
+        </div>
+
+    </div>
+
+
+</div>
+<!-- END MAIN PANEL -->
+
+<!-- PAGE FOOTER -->
+<div class="page-footer">
+    &copy; 2023 Your Company. All rights reserved.
+</div>
+<!-- END PAGE FOOTER -->
+
+<!-- /////////////////////////////////////////////////////////////////////////////////////////////// -->
+<script src="js/error-handling/errors.js"></script> <!-- error handling -->
+
+<script src="js/common-functions/request-template.js"></script> <!-- Get request function -->
+
+<script src="js/urls/urls.js"></script> <!-- Get All URLS -->
+
+<script src="js/GoJS/main.js"></script> <!-- main -->
+
+<script src="js/common-functions/formation-object-config.js"></script> <!-- main -->
+
+<script src="js/read-gitHub.js"></script> <!-- Work code  -->
+<!-- /////////////////////////////////////////////////////////////////////////////////////////////// -->
 
 </body>
+
 </html>
