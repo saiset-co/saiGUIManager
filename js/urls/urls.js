@@ -45,6 +45,10 @@ const configsURL = {
         docker: '',
         microservice: 'https://api.github.com/repos/saiset-co/saiFramework/contents/config/config.yaml'
     },
+    saiGUIManager: {
+        docker: '',
+        microservice: ''
+    },
     saiMessage: {
         docker: '',
         microservice: ''
@@ -124,6 +128,10 @@ const pathToConfig = {
     saiFramework: {
         docker: '',
         microservice: 'config/config.yaml'
+    },
+    saiGUIManager: {
+        docker: '',
+        microservice: ''
     },
     saiMessage: {
         docker: '',

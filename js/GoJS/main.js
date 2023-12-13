@@ -1,7 +1,7 @@
 function init() {
     const $ = go.GraphObject.make;
 
-    const myDiagram =
+    myDiagram =
         new go.Diagram("myDiagramDiv", {
             allowDelete: true,
             allowCopy: true,
@@ -11,15 +11,22 @@ function init() {
         });
 
     const itemTempl =
-        $(go.Panel, "Vertical",
+        $(go.Panel, "Horizontal",
             {
                 row: 1
             },
             $(go.TextBlock, {
+                row: 1,
                 font: "14px sans-serif",
                 margin: new go.Margin(0, 5, 5, 5),
-                editable: true // Додаємо editable для дозволу редагування тексту
-            }, new go.Binding("text", "data").makeTwoWay()) // Прив'язали текст пункту до значення до поля в масиві даних
+                // editable: true // Додаємо editable для дозволу редагування тексту
+            }, new go.Binding("text", "label")), // Прив'язали текст пункту до значення до поля в масиві даних
+            $(go.TextBlock, {
+                row: 2,
+                font: "14px sans-serif",
+                margin: new go.Margin(0, 5, 5, 5),
+                // editable: true // Додаємо editable для дозволу редагування тексту
+            }, new go.Binding("text", "data")) // Прив'язали текст пункту до значення до поля в масиві даних
         );
 
 
@@ -68,42 +75,80 @@ function init() {
 
     myDiagram.model = new go.GraphLinksModel({nodeDataArray: nodeDataArray});
 
-    if (window.Inspector) {
-        // Створення екземпляра Inspector та прив'язка до myDiagram
-        myInspector = new Inspector("myInspector", myDiagram, {
-            properties: {
-                nameService: { readOnly: true },
-                items: { show:false },
+    // Додаємо обробник вибору елемента для оновлення вмісту форми
+    myDiagram.addDiagramListener("ChangedSelection", function (e) {
+        const node = myDiagram.selection.first();
+        if (node) {
+            // Отримуємо всі пари ключа(вкладеність) та значення
+            const KeysAndValuesArray = getAllNestedKeysAndValues(node.data);
+            updateForm(KeysAndValuesArray);  // Оновлення форми при виборі вузла
+        }
+    });
+
+}
+
+// Обробник при кліці на Update config
+$(document).ready(function () {
+    $(".buttonEdit").on('click', function (event) {
+        event.preventDefault();
+
+        // Отримуємо всі label та input елементи
+        const labelKeys = $(".label");
+        const fieldValue = $(".input");
+        let keyAndValueArr = [];
+
+        // Перебираємо та записуємо не пусті поля з нашої форми
+        labelKeys.each(function (index, element) {
+            const key = $(element).text();
+            const value = $(fieldValue[index]).val();
+
+            const object = {
+                key: key,
+                value: value
             }
+            keyAndValueArr.push(object);
+
         });
-    }
 
-}
+        // Отримуємо дані з діаграми в acc через початкову модель діаграми
+        const reconstructedObject = keyAndValueArr.reduce((acc, item) => {
+            const keys = item.key.split('.'); // Розділення ключа по "." створення масиву ключів.
+            let currentObj = acc; // Ініціалізація currentObj з початковим acc
+            keys.forEach((key, index) => {
+                // Якщо ключ з масиву є останнім, то даємо йому значення
+                if (index === keys.length - 1) {
+                    currentObj[key] = item.value;
+                } else { // Якщо ні, то переходимо на наступний рівень вкладеності об'єкта
+                    currentObj[key] = currentObj[key] || {};
+                    currentObj = currentObj[key];
+                }
+            });
+            return acc;
+        }, {});
 
-// Ф-ція для додавання нового вузла до нашої діаграми
-function addNode(configs) {
+        const node = myDiagram.selection.first();
+        if (node) {
+            myDiagram.model.commit(m => {
+                // Оновлюємо кожне властивість вузла окремо
+                for (const key in reconstructedObject) {
+                    if (reconstructedObject.hasOwnProperty(key)) {
+                        m.setDataProperty(node.data, key, reconstructedObject[key]);
+                    }
+                }
+            }, "changed node data");
 
-    const myDiagram = getDiagramInstance(); // Отримати екземпляр діаграми
-    const model = myDiagram.model; // Отримати model діаграми
+            // Оновлюємо графіку
+            myDiagram.requestUpdate();
+        }
 
-    // Отримати останній ключ у масиві nodeDataArray
-    const lastKey = model.nodeDataArray.length > 0 ? model.nodeDataArray[model.nodeDataArray.length - 1].key : 0;
+        console.log(node.data);
+    });
+});
 
-    // Створити новий елемент для додавання
-    let newNode = configs;
-    newNode.key = lastKey + 1;
-
-    // Додати новий елемент у масив
-    model.addNodeData(newNode);
-    console.log(nodeDataArray);
-}
-
-// Ф-ція для отримання нашої діаграми з DOM
-function getDiagramInstance() {
-    // Отримати екземпляр діаграми
-    return go.Diagram.fromDiv(document.getElementById("myDiagramDiv"));
-}
+let nodeDataArray = [];
+let myDiagram;
 
 window.addEventListener('DOMContentLoaded', init);
 
-let nodeDataArray = [];
+
+

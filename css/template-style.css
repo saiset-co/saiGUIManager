@@ -62,6 +62,61 @@ li:hover {
     display: flex;
     flex-direction: column;
 }
+
+/* ------------------------ form ------------------------*/
+.updateFormDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    flex-direction: column;
+}
+
+.updateForm {
+    box-sizing: border-box;
+    background-color: #f7f7f7;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.label {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #555;
+}
+
+.buttonEdit {
+    background-color: #3498db;
+    color: #fff;
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.buttonBlock:hover {
+    background-color: #2980b9;
+}
 /* ------------------------ FOOTER ------------------------*/
 .page-footer {
     background-color: #333;
@@ -72,3 +127,4 @@ li:hover {
     bottom: 0;
     width: 100%;
 }
+
