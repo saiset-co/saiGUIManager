@@ -79,14 +79,14 @@ $(document).ready(async function () {
                     console.log(parsedData);
 
                     ////////////////////////////////////////////////////////
-                    // const objectToDisplay = parsedData;
-                    // const modalDiv = document.querySelector('.modal');
-                    //
-                    // const jsonString = JSON.stringify(objectToDisplay, null, 2);
-                    //
-                    // const htmlCode = `<pre>${jsonString}</pre>`;
-                    //
-                    // modalDiv.innerHTML = htmlCode;
+                    const objectToDisplay = parsedData;
+                    const modalDiv = document.querySelector('.modal');
+
+                    const jsonString = JSON.stringify(objectToDisplay, null, 2);
+
+                    const htmlCode = `<pre>${jsonString}</pre>`;
+
+                    modalDiv.innerHTML = htmlCode;
                     ////////////////////////////////////////////////////////
                     return parsedData;
                 } else if (
@@ -99,14 +99,14 @@ $(document).ready(async function () {
                     console.log(parsedData);
                     parsedData.nameService = microservice;
                     ////////////////////////////////////////////////////////
-                    // const objectToDisplay = parsedData;
-                    // const modalDiv = document.querySelector('.modal');
-                    //
-                    // const jsonString = JSON.stringify(objectToDisplay, null, 2);
-                    //
-                    // const htmlCode = `<pre>${jsonString}</pre>`;
-                    //
-                    // modalDiv.innerHTML = htmlCode;
+                    const objectToDisplay = parsedData;
+                    const modalDiv = document.querySelector('.modal');
+
+                    const jsonString = JSON.stringify(objectToDisplay, null, 2);
+
+                    const htmlCode = `<pre>${jsonString}</pre>`;
+
+                    modalDiv.innerHTML = htmlCode;
                     ////////////////////////////////////////////////////////
                     return parsedData;
                 }
@@ -119,7 +119,7 @@ $(document).ready(async function () {
     }
 
     // Global value
-    const accessToken = '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';
+    const accessToken = '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';
     const headers = {
         Authorization: `Bearer ${accessToken}`,
     };

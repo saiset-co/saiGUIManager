@@ -72,8 +72,61 @@ function init() {
             ),
         );
 
+    myDiagram.linkTemplate =
+        $(go.Link,  // Створюємо шаблон для ліній
+            {
+                selectionAdorned: true,  // Виділення лінії при виборі
+                layerName: "Front",  // Визначає шар для розташування лінії
+                reshapable: true,  // Можливість зміни форми лінії
+                curve: go.Link.JumpOver,  // Стиль кривизни лінії
+                isShadowed: true,  // Застосування тіні до лінії
+                shadowOffset: new go.Point(2, 2),  // Зміщення тіні
+                shadowColor: "#919cab",  // Колір тіні
+                routing: go.Link.Orthogonal,  // Ортогональний стиль маршрутизації
+                corner: 10  // Радіус закруглення лінії
+            },
+            $(go.Shape,  // Форма лінії
+                {stroke: "#f7f9fc", strokeWidth: 4}),  // Колір та товщина обводки лінії
+            $(go.Panel, "Position",  // Панель, яка регулює позицію внутрішніх елементів лінії
+                $(go.Panel, "Auto", {segmentIndex: 0, segmentOffset: new go.Point(22, 0)},  // Внутрішня панель для тексту "from"
+                    $(go.Shape, "RoundedRectangle", {fill: "#f7f9fc"}, {stroke: "#eeeeee"}),  // Форма та стиль для внутрішньої панелі
+                    $(go.TextBlock,  // Текстовий блок для "from" label
+                        {
+                            textAlign: "center",
+                            font: "bold 14px sans-serif",
+                            stroke: "black",
+                            background: "#f7f9fc",
+                            segmentOffset: new go.Point(NaN, NaN),
+                            segmentOrientation: go.Link.OrientUpright
+                        },
+                        new go.Binding("text", "text"))
+                ),
+                // Додатковий код для внутрішньої панелі "to"
+                // $(go.Panel, "Auto",
+                //     {
+                //         segmentIndex: -1,
+                //         segmentOffset: new go.Point(-13, 0)
+                //     },
+                //     $(go.Shape, "RoundedRectangle", { fill: "#edf6fc" }, { stroke: "#eeeeee" }),
+                //     $(go.TextBlock,
+                //         {
+                //             textAlign: "center",
+                //             font: "bold 14px sans-serif",
+                //             stroke: "black",
+                //             segmentIndex: -1,
+                //             segmentOffset: new go.Point(NaN, NaN),
+                //             segmentOrientation: go.Link.OrientUpright
+                //         },
+                //         new go.Binding("text", "toText"))
+                // )
+            )
+        );
 
-    myDiagram.model = new go.GraphLinksModel({nodeDataArray: nodeDataArray});
+
+    myDiagram.model = new go.GraphLinksModel({
+        nodeDataArray: nodeDataArray,
+        linkDataArray: linkDataArray
+    });
 
     // Додаємо обробник вибору елемента для оновлення вмісту форми
     myDiagram.addDiagramListener("ChangedSelection", function (e) {
@@ -87,66 +140,81 @@ function init() {
 
 }
 
+function updateClick() {
+    // Отримуємо всі label та input елементи
+    const labelKeys = $(".label");
+    const fieldValue = $(".input");
+
+    // Майбутній масив з парами вкладений ключ та його значення
+    let keyAndValueArr = [];
+
+    // Перебираємо та записуємо поля з нашої форми
+    labelKeys.each(function (index, element) {
+        const key = $(element).text();
+        const value = $(fieldValue[index]).val();
+
+        const object = {
+            key: key,
+            value: value
+        }
+
+        keyAndValueArr.push(object);
+    });
+
+    // Отримуємо дані з діаграми в acc через початкову модель діаграми
+    const reconstructedObject = keyAndValueArr.reduce((acc, item) => {
+        const keys = item.key.split('.'); // Розділення ключа по "." створення масиву ключів.
+        let currentObj = acc; // Ініціалізація currentObj з початковим acc
+
+        keys.forEach((key, index) => {
+            // Якщо ключ з масиву є останнім, то даємо йому значення
+            if (index === keys.length - 1) {
+                currentObj[key] = item.value;
+            } else {
+                // Якщо ні, то переходимо на наступний рівень вкладеності об'єкта
+                currentObj[key] = currentObj[key] || {};
+                currentObj = currentObj[key];
+            }
+        });
+        return acc;
+    }, {});
+
+    // Отримуємо перший вибраний вузол, хоча ми більше 1-го не можемо вибрати
+    const node = myDiagram.selection.first();
+    if (node) {
+        myDiagram.model.commit(m => {
+            // Оновлюємо кожне властивість вузла окремо
+            for (const key in reconstructedObject) {
+                if (reconstructedObject.hasOwnProperty(key)) {
+                    m.setDataProperty(node.data, key, reconstructedObject[key]);
+                }
+            }
+        }, "changed node data");
+
+
+    }
+
+    // Дивимося після зміни які в нас є спільні поля з іншими вузлами
+    const commonFields = compareFieldsForNode(node.data);
+
+    // Перебудовуємо зв'язки вузлів
+    connectNodes(commonFields, node.data, myDiagram)
+
+    // console.log(node.data);
+    myDiagram.requestUpdate(); // Оновлюємо графічне відображення
+}
+
 // Обробник при кліці на Update config
 $(document).ready(function () {
     $(".buttonEdit").on('click', function (event) {
         event.preventDefault();
-
-        // Отримуємо всі label та input елементи
-        const labelKeys = $(".label");
-        const fieldValue = $(".input");
-        let keyAndValueArr = [];
-
-        // Перебираємо та записуємо не пусті поля з нашої форми
-        labelKeys.each(function (index, element) {
-            const key = $(element).text();
-            const value = $(fieldValue[index]).val();
-
-            const object = {
-                key: key,
-                value: value
-            }
-            keyAndValueArr.push(object);
-
-        });
-
-        // Отримуємо дані з діаграми в acc через початкову модель діаграми
-        const reconstructedObject = keyAndValueArr.reduce((acc, item) => {
-            const keys = item.key.split('.'); // Розділення ключа по "." створення масиву ключів.
-            let currentObj = acc; // Ініціалізація currentObj з початковим acc
-            keys.forEach((key, index) => {
-                // Якщо ключ з масиву є останнім, то даємо йому значення
-                if (index === keys.length - 1) {
-                    currentObj[key] = item.value;
-                } else { // Якщо ні, то переходимо на наступний рівень вкладеності об'єкта
-                    currentObj[key] = currentObj[key] || {};
-                    currentObj = currentObj[key];
-                }
-            });
-            return acc;
-        }, {});
-
-        const node = myDiagram.selection.first();
-        if (node) {
-            myDiagram.model.commit(m => {
-                // Оновлюємо кожне властивість вузла окремо
-                for (const key in reconstructedObject) {
-                    if (reconstructedObject.hasOwnProperty(key)) {
-                        m.setDataProperty(node.data, key, reconstructedObject[key]);
-                    }
-                }
-            }, "changed node data");
-
-            // Оновлюємо графіку
-            myDiagram.requestUpdate();
-        }
-
-        console.log(node.data);
+        updateClick();
     });
 });
 
 let nodeDataArray = [];
 let myDiagram;
+let linkDataArray = []
 
 window.addEventListener('DOMContentLoaded', init);
 

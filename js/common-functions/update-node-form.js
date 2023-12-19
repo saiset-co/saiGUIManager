@@ -21,12 +21,4 @@ function updateForm(KeysAndValuesArray) {
         input.classList.add("input");
         form.appendChild(input); // Додаємо у форму
     });
-
-    // Додаємо кнопку "edit"
-    // const editButton = document.createElement("button");
-    // editButton.textContent = "Update config";
-    // editButton.classList.add("buttonEdit");
-
-    // Додаємо клас edit до кнопки
-    // form.appendChild(editButton);
 }
